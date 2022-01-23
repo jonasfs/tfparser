@@ -1,0 +1,92 @@
+{
+	"fileHash": "matchHash",
+	"timestamp": 1602966400,
+	"mapName": "de_dust2",
+	"finalScore1": "14",
+	"finalScore2": "16",
+	"surrender": 0,
+	"team1": {
+		"1": {
+			"steamid": "1",
+			"nickname": "name1",
+			"kills": "0",
+			"assists": "0",
+			"deaths": "0",
+			"rank": "0"
+		},
+		"2": {
+			"steamid": "2",
+			"nickname": "name2",
+			"kills": "0",
+			"assists": "0",
+			"deaths": "0",
+			"rank": "0"
+		}, 
+		"3": {
+			"steamid": "3",
+			"nickname": "name3",
+			"kills": "0",
+			"assists": "0",
+			"deaths": "0",
+			"rank": "0"
+		}, 
+		"4": {
+			"steamid": "4",
+			"nickname": "name4",
+			"kills": "0",
+			"assists": "0",
+			"deaths": "0",
+			"rank": "0"
+		}, 
+		"5": {
+			"steamid": "5",
+			"nickname": "name5",
+			"kills": "0",
+			"assists": "0",
+			"deaths": "0",
+			"rank": "0"
+		}
+	},
+	"team2": {
+		"6": {
+			"steamid": "6",
+			"nickname": "name6",
+			"kills": "0",
+			"assists": "0",
+			"deaths": "0",
+			"rank": "0"
+		},
+		"7": {
+			"steamid": "7",
+			"nickname": "name7",
+			"kills": "0",
+			"assists": "0",
+			"deaths": "0",
+			"rank": "0"
+		},
+		"8": {
+			"steamid": "8",
+			"nickname": "name8",
+			"kills": "0",
+			"assists": "0",
+			"deaths": "0",
+			"rank": "0"
+		},
+		"9": {
+			"steamid": "9",
+			"nickname": "name9",
+			"kills": "0",
+			"assists": "0",
+			"deaths": "0",
+			"rank": "0"
+		},
+		"10": {
+			"steamid": "10",
+			"nickname": "name10",
+			"kills": "0",
+			"assists": "0",
+			"deaths": "0",
+			"rank": "0"
+		}
+	}
+}
