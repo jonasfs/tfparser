@@ -6,7 +6,7 @@ import (
 
 	"github.com/asticode/go-astikit"
 	"github.com/asticode/go-astilectron"
-	"github.com/asticode/go-astilectron-bootstrap"
+	bootstrap "github.com/asticode/go-astilectron-bootstrap"
 )
 
 var (
@@ -17,7 +17,6 @@ func main() {
 	l := log.New(log.Writer(), log.Prefix(), log.Flags())
 
 	if err := bootstrap.Run(bootstrap.Options{
-		Asset: Asset,
 		AstilectronOptions: astilectron.Options{
 			AppName:            AppName,
 			AppIconDarwinPath:  "resources/icon.icns",
@@ -29,7 +28,6 @@ func main() {
 			w.OpenDevTools()
 			return nil
 		},
-		RestoreAssets: RestoreAssets,
 		Windows: []*bootstrap.Window{{
 			Homepage:       "index.html",
 			MessageHandler: handleMessages,

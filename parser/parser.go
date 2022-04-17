@@ -13,6 +13,7 @@ import (
 
 type timestamp time.Time
 
+// Parser is ...
 type Parser struct {
 	version   int
 	started   bool
@@ -22,9 +23,11 @@ type Parser struct {
 	channel   chan bool
 }
 
+// TODO: Add proper comment
 var TP Parser
 
-type ParserUtilsChecker interface {
+// TODO: Add proper comment
+type UtilsChecker interface {
 	HashFile(path string) ([]byte, error)
 	GetFiles(path string) ([]string, error)
 	GetParserVersion() int
@@ -70,8 +73,10 @@ func AddOrUpdateMatch(
 	mapname := ""
 	score1 := 0
 	score2 := 0
-	parsed_match = ParseMatch(path)
-	fmt.Printf("Parsing %s - %d : %d\n", parsed_match.mapname, parsed_match.score1, parsed_match.score2)
+	/*
+		parsed_match := ParseMatch(path)
+		fmt.Printf("Parsing %s - %d : %d\n", parsed_match.mapname, parsed_match.score1, parsed_match.score2)
+	*/
 
 	if err == gorm.ErrRecordNotFound {
 		match, err = database.DB.CreateMatch(currentVersion, hash, path, mapname, score1, score2)
