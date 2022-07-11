@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/asticode/go-astilectron"
 	bootstrap "github.com/asticode/go-astilectron-bootstrap"
@@ -118,6 +119,25 @@ func handleMessages(w *astilectron.Window, m bootstrap.MessageIn) (payload inter
 		fmt.Println("debug12 - getPlayerList message")
 		payload = parser.GetPlayerList()
 		return
+	case "setPlayerProfile":
+		var steamid string
+		if len(m.Payload) > 0 {
+			if err = json.Unmarshal(m.Payload, &steamid); err != nil {
+				payload = err.Error()
+				return
+			}
+			var steamid64 uint64
+			steamid64, err = strconv.ParseUint(string(steamid), 10, 64)
+			if err == nil {
+				payload, err = profile.SetPlayer(steamid64, db)
+				if err != nil {
+					payload = err.Error()
+				}
+			} else {
+				payload = err.Error()
+			}
+		}
+
 	}
 	return
 }

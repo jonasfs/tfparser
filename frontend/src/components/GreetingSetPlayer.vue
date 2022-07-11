@@ -16,7 +16,7 @@ export default {
 				{ text: 'Last Played', value: 'last' },
 			],
 			players: {},
-			sortBy: 'demos',
+			sortBy: ['demos', 'last'],
 			search: '',
 			parsing: 0,
 		}
@@ -39,7 +39,13 @@ export default {
 			this.players = Object.values(playerMap)
 		},
 		pickPlayer(steamid) {
-			global.backend.setPlayerProfile(steamid)
+			var self = this
+			global.backend.setPlayerProfile(steamid).then((message) => {
+				const {payload} = message
+				if (payload) {
+					self.$emit('next', 3)
+				}
+			})
 		},
 		formatDate(timestamp) {
 			return DateTime.fromISO(timestamp).toRelativeCalendar() 
@@ -92,10 +98,11 @@ export default {
 				></v-text-field>
 			</v-card-title>
 			<v-data-table
+				multi-sort
 				:headers="headers"
 				:items="Object.values(players)"
 				:sort-by.sync="sortBy"
-				:sort-desc="true"
+				:sort-desc="[true, true]"
 				:search="search"
 				:loading="parsing > 0"
 				:footer-props="{

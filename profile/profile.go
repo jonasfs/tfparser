@@ -57,3 +57,18 @@ func SetDemoPath(path string, db DatabaseChecker) (result bool, err error) {
 	result = db.SaveSettings(settings)
 	return
 }
+
+func SetPlayer(steamid uint64, db DatabaseChecker) (result bool, err error) {
+	result = false
+
+	var settings *models.Settings
+	settings, _ = db.Settings()
+	if settings == nil {
+		fmt.Printf("debug 5 - settings == nil")
+		settings = db.InitSettings()
+	}
+	settings.Player = steamid
+	settings.PlayerSet = true
+	result = db.SaveSettings(settings)
+	return
+}
