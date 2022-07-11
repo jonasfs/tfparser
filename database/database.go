@@ -1,8 +1,11 @@
 package database
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
+	"time"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -31,7 +34,12 @@ func init() {
 		panic("failed to connect database")
 	}
 
-	DB.db.AutoMigrate(&models.Settings{}, &models.Match{})
+	DB.db.AutoMigrate(
+		&models.Settings{},
+		&models.Match{},
+		&models.MatchPlayer{},
+		&models.Player{},
+	)
 }
 
 func (db database) Settings() (settings *models.Settings, err error) {
@@ -55,24 +63,38 @@ func (db database) SaveSettings(settings *models.Settings) bool {
 	return true
 }
 
+/* Match functions */
+
 func (db database) CreateMatch(
 	parserVersion int,
 	hash []byte,
 	path string,
+	date time.Time,
 	mapname string,
 	score1 int,
 	score2 int,
+	participants map[uint64]map[string]interface{},
 ) (match *models.Match, err error) {
 	match = &models.Match{
 		ParserVersion: parserVersion,
-		FileHash:      hash,
-		FilePath:      path,
-		MapName:       mapname,
-		FinalScore1:   score1,
-		FinalScore2:   score2,
+		FileHash: hash,
+		FilePath: path,
+		FileDate: date,
+		MapName: mapname,
+		Score1: score1,
+		Score2: score2,
 	}
 	result := DB.db.Create(match)
 	err = result.Error
+	if err == nil {
+		for steamid, player := range participants {
+			DB.CreateMatchPlayer(
+				match.ID,
+				steamid,
+				player["nickname"].(string),
+			)
+		}
+	}
 
 	return
 }
@@ -81,18 +103,21 @@ func (db database) UpdateMatch(
 	parserVersion int,
 	hash []byte,
 	path string,
+	date time.Time,
 	mapname string,
 	score1 int,
 	score2 int,
+	participants map[uint64]map[string]interface{},
 ) (match *models.Match, err error) {
 	match, err = DB.GetMatchByHash(hash)
 	if err != nil {
 		return
 	}
 	match.FilePath = path
+	match.FileDate = date
 	match.MapName = mapname
-	match.FinalScore1 = score1
-	match.FinalScore2 = score2
+	match.Score1 = score1
+	match.Score2 = score2
 	match.ParserVersion = parserVersion
 	DB.db.Save(match)
 	return
@@ -113,6 +138,98 @@ func (db database) GetMatchByHash(hash []byte) (*models.Match, error) {
 	}
 	return &match, err
 }
+
+/* Player functions */
+
+func (db database) CreatePlayer(
+	steamid uint64,
+) (player *models.Player, err error) {
+	player = &models.Player{
+		SteamID64: steamid,
+	}
+	result := DB.db.Create(player)
+	err = result.Error
+	return
+}
+
+func (db database) GetPlayerBySteamID(steamid uint64) (*models.Player, error) {
+	var err error
+	result := DB.db.Where(&models.Player{SteamID64: steamid})
+	err = result.Error
+	if err != nil {
+		return nil, err
+	}
+	var player models.Player
+	result.First(&player)
+	err = result.Error
+	if err != nil {
+		return nil, err
+	}
+	return &player, err
+}
+
+func (db database) GetPlayers() (map[string]map[string]interface{}) {
+	result := DB.db.Model(&models.Player{})
+	players := make(map[string]map[string]interface{})
+	rows, err := result.Rows()
+	defer rows.Close()
+	if err == nil {
+		for rows.Next() {
+			var player_object models.Player
+			DB.db.ScanRows(rows, &player_object)
+			fmt.Printf("%s\n", player_object)
+			player := make(map[string]interface{})
+			stringSteamID := strconv.FormatUint(player_object.SteamID64, 10)
+			player["steamid"] = stringSteamID
+			query := fmt.Sprintf(`
+				SELECT
+					match_players.nickname,
+					matches.file_date
+				FROM matches INNER JOIN match_players
+				ON matches.id = match_players.match_id
+				WHERE match_players.steam_id64 = %d
+				ORDER BY matches.file_date DESC LIMIT 1
+			`, player_object.SteamID64)
+
+			row := DB.db.Raw(query).Row()
+			var nickname string
+			var date time.Time
+			row.Scan(&nickname, &date)
+			player["nickname"] = nickname
+			player["last"] = date
+			query2 := fmt.Sprintf(`
+				SELECT
+					COUNT(*)
+				FROM match_players
+				WHERE match_players.steam_id64 = %d
+			`, player_object.SteamID64)
+			row2 := DB.db.Raw(query2).Row()
+			var demos int
+			row2.Scan(&demos)
+			player["demos"] = demos
+			players[stringSteamID] = player
+		}
+	}
+	return players
+}
+
+func (db database) CreateMatchPlayer(
+	matchID uint,
+	steamID uint64,
+	nickname string,
+) (match_player *models.MatchPlayer, err error) {
+	match_player = &models.MatchPlayer{
+		SteamID64: steamID,
+		MatchID: matchID,
+		Nickname: nickname,
+	}
+	result := DB.db.Create(match_player)
+	err = result.Error
+
+	return
+}
+
+
 
 /*
 func (db database) AddOrUpdateMatch(

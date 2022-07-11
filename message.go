@@ -114,6 +114,10 @@ func handleMessages(w *astilectron.Window, m bootstrap.MessageIn) (payload inter
 		path := settings.DemoPath
 		payload, err = parser.StartParser(w, path)
 		return
+	case "getPlayerList":
+		fmt.Println("debug12 - getPlayerList message")
+		payload = parser.GetPlayerList()
+		return
 	}
 	return
 }

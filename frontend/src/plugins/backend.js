@@ -41,3 +41,11 @@ export const fetchMatches = steamid => new Promise(
 		})
 	}
 )
+
+export const getPlayerList = () => new Promise(
+	resolve => {
+		astilectron.sendMessage({name:"getPlayerList"}, (msg) => {
+			resolve(msg)
+		})
+	}
+)

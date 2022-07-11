@@ -1,5 +1,5 @@
 <script>
-import * as matchUtils from '@/plugins/matchUtils'
+//import * as matchUtils from '@/plugins/matchUtils'
 
 export default {
 	name: 'MainContent',
@@ -23,10 +23,12 @@ export default {
 		}
 	},
 	methods: {
+		/*
 		addMatch(match) {
 			match.score = matchUtils.getMatchScoreString(this.userSteamid, match)
 			this.matches[match.fileHash] = match
 		},
+		*/
 		getDateString(timestamp) {
 			const myDate = new Date(parseInt(timestamp)*1000)
 			const locale = navigator.language
@@ -57,11 +59,18 @@ export default {
 			if (msg.name === 'parsing') {
 				self.parsing = parseInt(msg.payload)
 			} else if (msg.name === 'parsed') {
+				console.log("match parsed")
 				self.addMatch(msg.payload)
 				self.tableKey += 1
 				if (self.parsing > 0) {
 					self.parsing -= 1
 				}
+				global.backend.getPlayerList().then((message) => {
+					console.log("getPlayerList")
+					console.log(message)
+				})
+			} else if (msg.name === 'debug') {
+				console.log(msg)
 			}
 		})
 	},

@@ -38,13 +38,6 @@ export default {
 			})
 		},
 	},
-	created() {
-		global.backend.ee.on('backend-msg', (message) => {
-				if (message?.name === "parsing") {
-					console.log("parsed ", message?.payload)
-				}
-		})
-	},
 };
 </script>
 

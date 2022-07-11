@@ -1,5 +1,5 @@
 <script>
-import * as matchUtils from '@/plugins/matchUtils'
+import { DateTime } from 'luxon'
 
 export default {
 	name: 'GreetingSetPlayer',
@@ -13,7 +13,6 @@ export default {
 			headers: [
 				{ text: 'Name', value: 'nickname' },
 				{ text: 'Demos', value: 'demos' },
-				{ text: 'Rank', value: 'rank' },
 				{ text: 'Last Played', value: 'last' },
 			],
 			players: {},
@@ -23,57 +22,46 @@ export default {
 		}
 	},
 	methods: {
-		addPlayer(steamid, nickname, rank, timestamp) {
-			let newPlayer = !(Object.prototype.hasOwnProperty.call(this.players, steamid))
-			let player
-			if (newPlayer) {
-				player = {
-					steamid: steamid,
-					nickname: nickname,
-					rank: rank,
-					demos: 1,
-					last: timestamp,
-				}
-			} else {
-				player = this.players[steamid]
-				if (timestamp > player.last) {
-					player.last = timestamp
-					player.nickname = nickname
-					player.rank = rank
-				}
-				player.demos += 1
-			}
-			this.players[steamid] = player
-		},
-		addPlayers(playerArr, timestamp) {
-			playerArr.forEach((player) => {
-				const { steamid, nickname, rank } = player
-				this.addPlayer(steamid, nickname, rank, timestamp)
-			})
-		},
 		startParser() {
 			global.backend.initializeParser().then((message) => {
 				console.log("debug parserInitialized")
 				console.log(message)
 			})
 		},
+		getPlayers() {
+			console.log("debug getPlayerList")
+			global.backend.getPlayerList().then((message) => {
+				this.setPlayers(message.payload)
+				console.log(message)
+			})
+		},
+		setPlayers(playerMap) {
+			this.players = Object.values(playerMap)
+		},
 		pickPlayer(steamid) {
 			global.backend.setPlayerProfile(steamid)
+		},
+		formatDate(timestamp) {
+			return DateTime.fromISO(timestamp).toRelativeCalendar() 
 		},
 	},
 	created() {
 		this.parsing = this.demosFound
+		console.log("debug - listening")
 		global.backend.ee.on('backend-msg', (msg) => {
+			console.log("backend-msg:")
+			console.log(msg)
 			if (msg.name === 'parsing') {
 				this.parsing = parseInt(msg.payload)
 			} else if (msg.name === 'parsed') {
-				let playerList = matchUtils.getPlayerList(msg.payload)
-				this.addPlayers(playerList, msg.payload.timestamp)
+				console.log("parsed triggered")
 				this.parsing -= 1
+				this.getPlayers()
 			} else if (msg.name === 'playerSet') {
 				this.$emit('next', 3)
 			}
 		})
+		this.getPlayers()
 		this.startParser()
 	},
 };
@@ -126,8 +114,8 @@ export default {
 					>
 						<td>{{item.nickname}}</td>
 						<td data-test="demos">{{item.demos}}</td>
-						<td>{{item.rank}}</td>
-						<td>{{item.last}}</td>
+						<td> {{ formatDate(item.last) }} </td>
+
 					</tr>
 				</template>
 			</v-data-table>
