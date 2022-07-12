@@ -28,6 +28,7 @@ func main() {
 			w.OpenDevTools()
 			return nil
 		},
+		RestoreAssets: RestoreAssets,
 		Windows: []*bootstrap.Window{{
 			Homepage:       "index.html",
 			MessageHandler: handleMessages,
