@@ -34,9 +34,20 @@ export const setPlayerProfile = steamid => new Promise(
 	}
 )
 
+export const getPlayerProfile = () => new Promise(
+	resolve => {
+		astilectron.sendMessage({name:"getPlayerProfile"}, (msg) => {
+			resolve(msg)
+		})
+	}
+)
+
 export const fetchMatches = steamid => new Promise(
 	resolve => {
-		astilectron.sendMessage({name:"fetchMatches", payload: steamid}, (msg) => {
+		astilectron.sendMessage({
+			name:"getPlayerMatches",
+			payload: steamid
+		}, (msg) => {
 			resolve(msg)
 		})
 	}

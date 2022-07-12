@@ -139,6 +139,40 @@ func (db database) GetMatchByHash(hash []byte) (*models.Match, error) {
 	return &match, err
 }
 
+func (db database) GetPlayerMatches(steamid uint64) (
+	map[string]map[string]interface{},
+) {
+
+	matches := make(map[string]map[string]interface{})
+	query := fmt.Sprintf(`
+		SELECT
+			matches.id,
+			matches.file_date,
+			matches.map_name
+		FROM matches INNER JOIN match_players
+		ON matches.id = match_players.match_id
+		WHERE match_players.steam_id64 = %d
+		ORDER BY matches.file_date DESC
+	`, steamid)
+	rows, err := DB.db.Raw(query).Rows()
+	defer rows.Close()
+	if err == nil {
+		for rows.Next() {
+			match := make(map[string]interface{})
+			var id uint
+			var timestamp time.Time
+			var map_name string
+			rows.Scan(&id, &timestamp, &map_name)
+			idString := fmt.Sprintf("%d", id)
+			match["id"] = idString
+			match["timestamp"] = timestamp
+			match["mapName"] = map_name
+			matches[idString] = match
+		}
+	}
+	return matches
+}
+
 /* Player functions */
 
 func (db database) CreatePlayer(
@@ -228,40 +262,3 @@ func (db database) CreateMatchPlayer(
 
 	return
 }
-
-
-
-/*
-func (db database) AddOrUpdateMatch(
-	p ParserUtilsChecker,
-	path string,
-) (match *models.Match, err error) {
-	// get file hash first
-	var hash []byte
-	hash, err = p.HashFile(path)
-	if err != nil {
-		return
-	}
-
-	// check if match was parsed before
-	match, err = DB.GetMatchByHash(hash)
-	currentVersion := p.GetParserVersion()
-
-	if match != nil && ((match.ParserVersion == currentVersion) && (match.FilePath == path)) {
-		return match, err
-	}
-
-	mapname := ""
-	score1 := 0
-	score2 := 0
-	mapname, score1, score2 = parser.ParseMatch(path) // TODO
-
-	if err == gorm.ErrRecordNotFound {
-		match, err = DB.CreateMatch(currentVersion, hash, path, mapname, score1, score2)
-	} else {
-		match, err = DB.UpdateMatch(currentVersion, hash, path, mapname, score1, score2)
-	}
-
-	return match, err
-}
-*/

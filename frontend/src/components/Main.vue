@@ -8,17 +8,14 @@ export default {
 		Drawer,
 		MainContent,
 	},
-	data() {
-		return {
-			userSteamid: 1,
-		}
-	},
 };
 </script>
 
 <template>
 	<div>
 		<Drawer/>
-		<MainContent data-test="MainContent" :userSteamid="userSteamid"/>
+		<MainContent
+			data-test="MainContent"
+		/>
 	</div>
 </template>

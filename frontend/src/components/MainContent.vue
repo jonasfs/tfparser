@@ -1,19 +1,13 @@
 <script>
-//import * as matchUtils from '@/plugins/matchUtils'
+import { DateTime } from 'luxon'
 
 export default {
 	name: 'MainContent',
-	props: {
-		userSteamid: {
-			type: Number,
-		},
-	},
 	data() {
 		return {
 			headers: [
 				{ text: 'Date', value: 'timestamp' },
 				{ text: 'Map', value: 'mapName' },
-				{ text: 'Score', value: 'score', sortable: false },
 			],
 			matches: {},
 			sortBy: 'timestamp',
@@ -23,53 +17,38 @@ export default {
 		}
 	},
 	methods: {
-		/*
-		addMatch(match) {
-			match.score = matchUtils.getMatchScoreString(this.userSteamid, match)
-			this.matches[match.fileHash] = match
+		formatDate(timestamp) {
+			return DateTime.fromISO(timestamp).toRelativeCalendar() 
 		},
-		*/
-		getDateString(timestamp) {
-			const myDate = new Date(parseInt(timestamp)*1000)
-			const locale = navigator.language
-			const currentYear = new Date().getFullYear()
-			let dateString = ''
-			dateString += new Intl.DateTimeFormat(locale, { weekday: 'short' }).format(myDate)
-			dateString += ' '
-			dateString += new Intl.DateTimeFormat(locale, { day: 'numeric' }).format(myDate)
-			dateString += ' '
-			dateString += new Intl.DateTimeFormat(locale, { month: 'short' }).format(myDate)
-			if (myDate.getFullYear() < currentYear) {
-				dateString += ' '
-				dateString += new Intl.DateTimeFormat(locale, { year: '2-digit' }).format(myDate)
-			}
-			return dateString
+		getMatches(steamid) {
+			console.log(steamid)
+			global.backend.fetchMatches(steamid).then((message) => {
+				console.log(message)
+				this.matches = Object.values(message.payload)
+			})
+		},
+		getPlayerProfile() {
+			global.backend.getPlayerProfile().then((message) => {
+				console.log(message)
+				this.getMatches(message.payload)
+			})
 		},
 	},
 	created() {
 		let self = this
-		global.backend.fetchMatches(this.userSteamid).then((message) => {
-			Object.values(message.payload).forEach((match) => {
-				self.addMatch(match)
-			})
-			self.tableKey += 1
-			self.fetching = 0
-		})
+		this.getPlayerProfile()
 		global.backend.ee.on('backend-msg', (msg) => {
 			if (msg.name === 'parsing') {
 				self.parsing = parseInt(msg.payload)
 			} else if (msg.name === 'parsed') {
 				console.log("match parsed")
-				self.addMatch(msg.payload)
+				//self.addMatch(msg.payload)
 				self.tableKey += 1
 				if (self.parsing > 0) {
 					self.parsing -= 1
 				}
-				global.backend.getPlayerList().then((message) => {
-					console.log("getPlayerList")
-					console.log(message)
-				})
-			} else if (msg.name === 'debug') {
+			} else {
+				console.log("debug")
 				console.log(msg)
 			}
 		})
@@ -101,9 +80,8 @@ export default {
 					<tr
 						:key="item.fileHash"
 					>
-						<td width="150"> {{ getDateString(item.timestamp) }} </td>
+						<td width="150"> {{ formatDate(item.timestamp) }} </td>
 						<td> {{ item.mapName }} </td>
-						<td> {{ item.score }} </td>
 					</tr>
 				</template>
 			</v-data-table>

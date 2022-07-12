@@ -223,3 +223,10 @@ func GetPlayerList() (players map[string]map[string]interface{}) {
 	players = database.DB.GetPlayers()
 	return
 }
+func GetPlayerMatches(steamid uint64) (
+	players map[string]map[string]interface{},
+) {
+	fmt.Printf("debug - GetPlayerMatches")
+	players = database.DB.GetPlayerMatches(steamid)
+	return
+}

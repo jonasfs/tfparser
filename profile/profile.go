@@ -72,3 +72,11 @@ func SetPlayer(steamid uint64, db DatabaseChecker) (result bool, err error) {
 	result = db.SaveSettings(settings)
 	return
 }
+
+func GetPlayer(db DatabaseChecker) (steamid uint64, err error) {
+	settings, err := db.Settings()
+	if err == nil {
+		steamid = settings.Player
+	}
+	return
+}

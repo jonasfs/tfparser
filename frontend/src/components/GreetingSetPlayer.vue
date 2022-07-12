@@ -31,18 +31,16 @@ export default {
 		getPlayers() {
 			console.log("debug getPlayerList")
 			global.backend.getPlayerList().then((message) => {
-				this.setPlayers(message.payload)
+				this.players = Object.values(message.payload)
 				console.log(message)
 			})
-		},
-		setPlayers(playerMap) {
-			this.players = Object.values(playerMap)
 		},
 		pickPlayer(steamid) {
 			var self = this
 			global.backend.setPlayerProfile(steamid).then((message) => {
 				const {payload} = message
 				if (payload) {
+					localStorage.setItem("steamid", steamid)
 					self.$emit('next', 3)
 				}
 			})
