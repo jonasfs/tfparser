@@ -10,6 +10,7 @@ import (
 	"gorm.io/gorm"
 	"topfrag.org/tfparser/database"
 	dem "github.com/markus-wa/demoinfocs-golang/v2/pkg/demoinfocs"
+	"github.com/markus-wa/demoinfocs-golang/v2/pkg/demoinfocs/events"
 )
 
 type timestamp time.Time
@@ -168,6 +169,37 @@ func ParseMatch(path string) (
 	score2 = 0
 	stat, _ := f.Stat()
 	date = stat.ModTime()
+	var pointer1 *int
+	var pointer2 *int
+	pointer1 = &score1
+	pointer2 = &score2
+
+	p.RegisterEventHandler(func(e events.TeamSideSwitch) {
+		if (pointer1 == &score1) {
+			pointer1 = &score2
+			pointer2 = &score1
+		} else {
+			pointer1 = &score1
+			pointer2 = &score2
+		}
+	})
+	p.RegisterEventHandler(func(e events.ScoreUpdated) {
+		/*
+		props := e.TeamState.Entity.Properties()
+		for _, s := range props {
+			fmt.Printf("%s\n", s)
+		}
+		*/
+		team_prop, _ := e.TeamState.Entity.PropertyValue("m_iTeamNum")
+		score_prop, _ := e.TeamState.Entity.PropertyValue("m_scoreTotal")
+		team := team_prop.IntVal
+		score := score_prop.IntVal
+		if team == 2 {
+			*pointer1 = score
+		} else if team == 3 {
+			*pointer2 = score
+		}
+	})
 
 	err = p.ParseToEnd()
 	if err != nil {

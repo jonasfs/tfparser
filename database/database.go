@@ -148,7 +148,9 @@ func (db database) GetPlayerMatches(steamid uint64) (
 		SELECT
 			matches.id,
 			matches.file_date,
-			matches.map_name
+			matches.map_name,
+			matches.score1,
+			matches.score2
 		FROM matches INNER JOIN match_players
 		ON matches.id = match_players.match_id
 		WHERE match_players.steam_id64 = %d
@@ -160,13 +162,16 @@ func (db database) GetPlayerMatches(steamid uint64) (
 		for rows.Next() {
 			match := make(map[string]interface{})
 			var id uint
+			var score1, score2 int
 			var timestamp time.Time
 			var map_name string
-			rows.Scan(&id, &timestamp, &map_name)
+			rows.Scan(&id, &timestamp, &map_name, &score1, &score2)
 			idString := fmt.Sprintf("%d", id)
 			match["id"] = idString
 			match["timestamp"] = timestamp
 			match["mapName"] = map_name
+			match["score1"] = score1
+			match["score2"] = score2
 			matches[idString] = match
 		}
 	}

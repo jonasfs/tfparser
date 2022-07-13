@@ -8,6 +8,7 @@ export default {
 			headers: [
 				{ text: 'Date', value: 'timestamp' },
 				{ text: 'Map', value: 'mapName' },
+				{ text: 'Score', value: 'score', sortable: false },
 			],
 			matches: {},
 			sortBy: 'timestamp',
@@ -19,6 +20,11 @@ export default {
 	methods: {
 		formatDate(timestamp) {
 			return DateTime.fromISO(timestamp).toRelativeCalendar() 
+		},
+		formatScore(score1, score2) {
+			const formatedScore1 = String(score1).padStart(2, "0")
+			const formatedScore2 = String(score2).padStart(2, "0")
+			return formatedScore1 + " - " + formatedScore2
 		},
 		getMatches(steamid) {
 			console.log(steamid)
@@ -82,6 +88,7 @@ export default {
 					>
 						<td width="150"> {{ formatDate(item.timestamp) }} </td>
 						<td> {{ item.mapName }} </td>
+						<td> {{ formatScore(item.score1, item.score2) }} </td>
 					</tr>
 				</template>
 			</v-data-table>
