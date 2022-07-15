@@ -168,9 +168,6 @@ func handleMessages(w *astilectron.Window, m bootstrap.MessageIn) (payload inter
 				}
 			}
 			return
-
-		return
 	}
-
 	return
 }
