@@ -31,5 +31,6 @@ repos:
     -   id: eslint
     types: [file]
     types_or: [javascript, jsx, ts, tsx, vue]
+    args: [-max-len, 79]
     additional_dependencies:
     -   eslint-plugin-vue@v7.5.0
