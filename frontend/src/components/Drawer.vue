@@ -33,7 +33,7 @@ export default {
 					<v-list-item-icon>
 					</v-list-item-icon>
 					<v-list-item-title>
-						Trocar Usuário
+					  Change User
 					</v-list-item-title>
 				</v-list-item>
 			</v-list>
