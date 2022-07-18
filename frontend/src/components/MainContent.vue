@@ -19,7 +19,7 @@ export default {
 	},
 	methods: {
 		formatDate(timestamp) {
-			return DateTime.fromISO(timestamp).toRelativeCalendar() 
+			return DateTime.fromISO(timestamp).toRelativeCalendar()
 		},
 		formatScore(score1, score2) {
 			const formatedScore1 = String(score1).padStart(2, "0")
@@ -35,8 +35,7 @@ export default {
 		},
 		getPlayerProfile() {
 			global.backend.getPlayerProfile().then((message) => {
-				console.log(message)
-				this.getMatches(message.payload)
+				this.getMatches(message.payload.steamid)
 			})
 		},
 	},

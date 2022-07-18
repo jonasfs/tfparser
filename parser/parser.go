@@ -2,15 +2,15 @@ package parser
 
 import (
 	"fmt"
-	"time"
 	"os"
+	"time"
 
 	"github.com/asticode/go-astilectron"
 	bootstrap "github.com/asticode/go-astilectron-bootstrap"
-	"gorm.io/gorm"
-	"topfrag.org/tfparser/database"
 	dem "github.com/markus-wa/demoinfocs-golang/v2/pkg/demoinfocs"
 	"github.com/markus-wa/demoinfocs-golang/v2/pkg/demoinfocs/events"
+	"gorm.io/gorm"
+	"topfrag.org/tfparser/database"
 )
 
 type timestamp time.Time
@@ -175,7 +175,7 @@ func ParseMatch(path string) (
 	pointer2 = &score2
 
 	p.RegisterEventHandler(func(e events.TeamSideSwitch) {
-		if (pointer1 == &score1) {
+		if pointer1 == &score1 {
 			pointer1 = &score2
 			pointer2 = &score1
 		} else {
@@ -185,10 +185,10 @@ func ParseMatch(path string) (
 	})
 	p.RegisterEventHandler(func(e events.ScoreUpdated) {
 		/*
-		props := e.TeamState.Entity.Properties()
-		for _, s := range props {
-			fmt.Printf("%s\n", s)
-		}
+			props := e.TeamState.Entity.Properties()
+			for _, s := range props {
+				fmt.Printf("%s\n", s)
+			}
 		*/
 		team_prop, _ := e.TeamState.Entity.PropertyValue("m_iTeamNum")
 		score_prop, _ := e.TeamState.Entity.PropertyValue("m_scoreTotal")

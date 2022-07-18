@@ -1,6 +1,21 @@
 <script>
 export default {
 	name: 'Drawer',
+	data() {
+		return {
+			user: {},
+		}
+	},
+	methods: {
+		getUser() {
+			global.backend.getPlayerProfile().then((message) => {
+				this.user = message.payload
+			})
+		},
+	},
+	created() {
+		this.getUser()
+	},
 };
 </script>
 
@@ -15,13 +30,15 @@ export default {
 			data-test="Drawer"
 		>
 			<v-list>
-				<v-list-item class="px-2" two-line>
-					<v-list-item-avatar>
-						<v-img src="https://randomuser.me/api/portraits/women/81.jpg"></v-img>
-					</v-list-item-avatar>
+				<v-list-item>
+					<v-list-item-icon>
+						<v-icon>
+							mdi-account
+						</v-icon>
+					</v-list-item-icon>
 
 					<v-list-item-content>
-						<v-list-item-title>Player</v-list-item-title>
+						<v-list-item-title v-text="user.nickname"></v-list-item-title>
 					</v-list-item-content>
 				</v-list-item>
 			</v-list>
@@ -33,7 +50,7 @@ export default {
 					<v-list-item-icon>
 					</v-list-item-icon>
 					<v-list-item-title>
-					  Change User
+						Change User
 					</v-list-item-title>
 				</v-list-item>
 			</v-list>

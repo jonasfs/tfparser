@@ -77,12 +77,12 @@ func (db database) CreateMatch(
 ) (match *models.Match, err error) {
 	match = &models.Match{
 		ParserVersion: parserVersion,
-		FileHash: hash,
-		FilePath: path,
-		FileDate: date,
-		MapName: mapname,
-		Score1: score1,
-		Score2: score2,
+		FileHash:      hash,
+		FilePath:      path,
+		FileDate:      date,
+		MapName:       mapname,
+		Score1:        score1,
+		Score2:        score2,
 	}
 	result := DB.db.Create(match)
 	err = result.Error
@@ -139,9 +139,7 @@ func (db database) GetMatchByHash(hash []byte) (*models.Match, error) {
 	return &match, err
 }
 
-func (db database) GetPlayerMatches(steamid uint64) (
-	map[string]map[string]interface{},
-) {
+func (db database) GetPlayerMatches(steamid uint64) map[string]map[string]interface{} {
 
 	matches := make(map[string]map[string]interface{})
 	query := fmt.Sprintf(`
@@ -207,7 +205,7 @@ func (db database) GetPlayerBySteamID(steamid uint64) (*models.Player, error) {
 	return &player, err
 }
 
-func (db database) GetPlayers() (map[string]map[string]interface{}) {
+func (db database) GetPlayers() map[string]map[string]interface{} {
 	result := DB.db.Model(&models.Player{})
 	players := make(map[string]map[string]interface{})
 	rows, err := result.Rows()
@@ -216,26 +214,11 @@ func (db database) GetPlayers() (map[string]map[string]interface{}) {
 		for rows.Next() {
 			var player_object models.Player
 			DB.db.ScanRows(rows, &player_object)
-			fmt.Printf("%s\n", player_object)
 			player := make(map[string]interface{})
 			stringSteamID := strconv.FormatUint(player_object.SteamID64, 10)
 			player["steamid"] = stringSteamID
-			query := fmt.Sprintf(`
-				SELECT
-					match_players.nickname,
-					matches.file_date
-				FROM matches INNER JOIN match_players
-				ON matches.id = match_players.match_id
-				WHERE match_players.steam_id64 = %d
-				ORDER BY matches.file_date DESC LIMIT 1
-			`, player_object.SteamID64)
-
-			row := DB.db.Raw(query).Row()
-			var nickname string
-			var date time.Time
-			row.Scan(&nickname, &date)
-			player["nickname"] = nickname
-			player["last"] = date
+			player["nickname"], player["last"], err = DB.GetLatestNickname(
+				player_object.SteamID64)
 			query2 := fmt.Sprintf(`
 				SELECT
 					COUNT(*)
@@ -259,11 +242,29 @@ func (db database) CreateMatchPlayer(
 ) (match_player *models.MatchPlayer, err error) {
 	match_player = &models.MatchPlayer{
 		SteamID64: steamID,
-		MatchID: matchID,
-		Nickname: nickname,
+		MatchID:   matchID,
+		Nickname:  nickname,
 	}
 	result := DB.db.Create(match_player)
 	err = result.Error
 
+	return
+}
+
+func (db database) GetLatestNickname(
+	steamid uint64,
+) (nickname string, date time.Time, err error) {
+	query := fmt.Sprintf(`
+		SELECT
+			match_players.nickname,
+			matches.file_date
+		FROM matches INNER JOIN match_players
+		ON matches.id = match_players.match_id
+		WHERE match_players.steam_id64 = %d
+		ORDER BY matches.file_date DESC LIMIT 1
+	`, steamid)
+
+	row := DB.db.Raw(query).Row()
+	row.Scan(&nickname, &date)
 	return
 }
