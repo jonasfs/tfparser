@@ -1,17 +1,17 @@
 <script>
-import Index from '@/components/Index.vue'
+import PreMain from '@/components/PreMain.vue'
 
 export default {
   name: 'App',
   components: {
-    Index,
+    PreMain,
   },
 };
 </script>
 
 <template>
 	<v-app>
-		<Index/>
+		<PreMain/>
   </v-app>
 </template>
 

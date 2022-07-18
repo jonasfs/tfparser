@@ -2,7 +2,6 @@
 import GreetingIntro from '@/components/GreetingIntro'
 import GreetingSetPath from '@/components/GreetingSetPath'
 import GreetingSetPlayer from '@/components/GreetingSetPlayer'
-import GreetingEnd from '@/components/GreetingEnd'
 
 export default {
 	name: 'FirstTime',
@@ -10,7 +9,6 @@ export default {
 		GreetingIntro,
 		GreetingSetPath,
 		GreetingSetPlayer,
-		GreetingEnd,
 	},
 	data() {
 		return {
@@ -45,14 +43,8 @@ export default {
 				<div v-else-if="step == 2" key="3">
 					<GreetingSetPlayer
 						:demosFound="demosFound"
-						@next="next"
-						data-test="GreetingSetPlayer"
-					/>
-				</div>
-				<div v-else-if="step == 3" key="4">
-					<GreetingEnd
-						data-test="GreetingEnd"
 						@toggleFirstTime="toggleFirstTime"
+						data-test="GreetingSetPlayer"
 					/>
 				</div>
 			</transition>

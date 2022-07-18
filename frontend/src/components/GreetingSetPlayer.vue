@@ -36,12 +36,11 @@ export default {
 			})
 		},
 		pickPlayer(steamid) {
-			var self = this
 			global.backend.setPlayerProfile(steamid).then((message) => {
 				const {payload} = message
 				if (payload) {
 					localStorage.setItem("steamid", steamid)
-					self.$emit('next', 3)
+					this.$emit('toggleFirstTime')
 				}
 			})
 		},
@@ -61,8 +60,6 @@ export default {
 				console.log("parsed triggered")
 				this.parsing -= 1
 				this.getPlayers()
-			} else if (msg.name === 'playerSet') {
-				this.$emit('next', 3)
 			}
 		})
 		this.getPlayers()
