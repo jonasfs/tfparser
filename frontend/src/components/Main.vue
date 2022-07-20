@@ -8,14 +8,20 @@ export default {
 		Drawer,
 		MainContent,
 	},
+	methods: {
+		refreshMain() {
+			this.$refs.main.getPlayerProfile()
+		}
+	},
 };
 </script>
 
 <template>
 	<div>
-		<Drawer/>
+		<Drawer @refreshMain="refreshMain"/>
 		<MainContent
 			data-test="MainContent"
+			ref="main"
 		/>
 	</div>
 </template>

@@ -40,12 +40,12 @@ export default {
 				const {payload} = message
 				if (payload) {
 					localStorage.setItem("steamid", steamid)
-					this.$emit('toggleFirstTime')
+					this.$emit('done')
 				}
 			})
 		},
 		formatDate(timestamp) {
-			return DateTime.fromISO(timestamp).toRelativeCalendar() 
+			return DateTime.fromISO(timestamp).toRelativeCalendar()
 		},
 	},
 	created() {

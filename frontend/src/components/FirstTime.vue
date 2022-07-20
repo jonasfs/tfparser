@@ -43,7 +43,7 @@ export default {
 				<div v-else-if="step == 2" key="3">
 					<GreetingSetPlayer
 						:demosFound="demosFound"
-						@toggleFirstTime="toggleFirstTime"
+						@done="toggleFirstTime"
 						data-test="GreetingSetPlayer"
 					/>
 				</div>
