@@ -26,7 +26,7 @@ func (d dbCheckMock) SaveSettings(settings *models.Settings) bool {
 }
 
 func (d dbCheckMock) GetLatestNickname(steamid uint64) (string, time.Time, error){
-	return "test", time.Now(), nil
+	return database.DB.GetLatestNickname(steamid)
 }
 
 func TestCheckFirstTime(t *testing.T) {
