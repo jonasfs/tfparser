@@ -3,6 +3,7 @@ package profile
 import (
 	"errors"
 	"testing"
+  "time"
 
 	"topfrag.org/tfparser/database"
 	"topfrag.org/tfparser/models"
@@ -22,6 +23,10 @@ func (d dbCheckMock) InitSettings() *models.Settings {
 
 func (d dbCheckMock) SaveSettings(settings *models.Settings) bool {
 	return database.DB.SaveSettings(settings)
+}
+
+func (d dbCheckMock) GetLatestNickname(steamid uint64) (string, time.Time, error){
+	return "test", time.Now(), nil
 }
 
 func TestCheckFirstTime(t *testing.T) {
